@@ -9,4 +9,4 @@ plugins {
 }
 
 rootProject.name = 'mybatis-reload'
-include('lib')
+include('core')
