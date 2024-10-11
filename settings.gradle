@@ -5,9 +5,24 @@
  * For more detailed information on multi-project builds, please refer to https://docs.gradle.org/8.7/userguide/multi_project_builds.html in the Gradle documentation.
  */
 
+pluginManagement {
+    repositories {
+        maven {
+            url 'https://maven.aliyun.com/repository/gradle-plugin'
+        }
+        gradlePluginPortal()
+    }
+}
+
 plugins {
 }
 
 rootProject.name = 'mybatis-reload'
+// 重载功能
 include('core')
+// 演示代码，tomcat环境使用
 include('example:web')
+// springboot环境使用
+include('example:springboot')
+// 标准app，即从自己编写main方法启动，只包含mybaits依赖
+include('example:standard-app')
