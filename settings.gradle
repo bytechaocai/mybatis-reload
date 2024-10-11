@@ -10,4 +10,4 @@ plugins {
 
 rootProject.name = 'mybatis-reload'
 include('core')
-include('example:tomcat')
+include('example:web')
