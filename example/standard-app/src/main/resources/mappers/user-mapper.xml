@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userMapper">
+
+  <resultMap id="BaseResultMap" type="com.chen.mybatisreload.example.standardapp.entity.User">
+    <id property="id" column="ID" jdbcType="VARCHAR"/>
+    <result property="username" column="USERNAME" jdbcType="VARCHAR"/>
+    <result property="age" column="AGE" jdbcType="INTEGER"/>
+    <result property="birthday" column="BIRTHDAY" jdbcType="TIMESTAMP"/>
+    <result property="deleteStatus" column="DELETE_STATUS" jdbcType="INTEGER"/>
+    <result property="createTime" column="CREATE_TIME" jdbcType="TIMESTAMP"/>
+    <result property="updateTime" column="UPDATE_TIME" jdbcType="TIMESTAMP"/>
+    <result property="deleteTime" column="DELETE_TIME" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    ID,USERNAME,AGE,
+        BIRTHDAY,DELETE_STATUS,CREATE_TIME,
+        UPDATE_TIME,DELETE_TIME
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="string" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from MYBATIS.T_USER
+    where  ID = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="string">
+    delete from MYBATIS.T_USER
+    where  ID = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="id" parameterType="com.chen.mybatisreload.example.standardapp.entity.User" useGeneratedKeys="true">
+    insert into MYBATIS.T_USER
+    ( ID,USERNAME,AGE
+    ,BIRTHDAY,DELETE_STATUS,CREATE_TIME
+    ,UPDATE_TIME,DELETE_TIME)
+    values (#{id,jdbcType=VARCHAR},#{username,jdbcType=VARCHAR},#{age,jdbcType=INTEGER}
+           ,#{birthday,jdbcType=TIMESTAMP},#{deleteStatus,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP}
+           ,#{updateTime,jdbcType=TIMESTAMP},#{deleteTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="id" parameterType="com.chen.mybatisreload.example.standardapp.entity.User" useGeneratedKeys="true">
+    insert into MYBATIS.T_USER
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">ID,</if>
+      <if test="username != null">USERNAME,</if>
+      <if test="age != null">AGE,</if>
+      <if test="birthday != null">BIRTHDAY,</if>
+      <if test="deleteStatus != null">DELETE_STATUS,</if>
+      <if test="createTime != null">CREATE_TIME,</if>
+      <if test="updateTime != null">UPDATE_TIME,</if>
+      <if test="deleteTime != null">DELETE_TIME,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">#{id,jdbcType=VARCHAR},</if>
+      <if test="username != null">#{username,jdbcType=VARCHAR},</if>
+      <if test="age != null">#{age,jdbcType=INTEGER},</if>
+      <if test="birthday != null">#{birthday,jdbcType=TIMESTAMP},</if>
+      <if test="deleteStatus != null">#{deleteStatus,jdbcType=INTEGER},</if>
+      <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
+      <if test="updateTime != null">#{updateTime,jdbcType=TIMESTAMP},</if>
+      <if test="deleteTime != null">#{deleteTime,jdbcType=TIMESTAMP},</if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.chen.mybatisreload.example.standardapp.entity.User">
+    update MYBATIS.T_USER
+    <set>
+      <if test="username != null">
+        USERNAME = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null">
+        AGE = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="birthday != null">
+        BIRTHDAY = #{birthday,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deleteStatus != null">
+        DELETE_STATUS = #{deleteStatus,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deleteTime != null">
+        DELETE_TIME = #{deleteTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where   ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.chen.mybatisreload.example.standardapp.entity.User">
+    update MYBATIS.T_USER
+    set
+      USERNAME =  #{username,jdbcType=VARCHAR},
+      AGE =  #{age,jdbcType=INTEGER},
+      BIRTHDAY =  #{birthday,jdbcType=TIMESTAMP},
+      DELETE_STATUS =  #{deleteStatus,jdbcType=INTEGER},
+      CREATE_TIME =  #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_TIME =  #{updateTime,jdbcType=TIMESTAMP},
+      DELETE_TIME =  #{deleteTime,jdbcType=TIMESTAMP}
+    where   ID = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

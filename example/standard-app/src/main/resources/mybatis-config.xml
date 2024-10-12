@@ -21,6 +21,7 @@
     </environment>
   </environments>
   <mappers>
+    <mapper resource="mappers/user-mapper.xml"/>
     <package name="com.chen.mybatisreload.example.standardapp.mapper"/>
   </mappers>
 </configuration>

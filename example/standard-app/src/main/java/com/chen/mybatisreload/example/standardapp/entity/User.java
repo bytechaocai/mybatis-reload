@@ -11,7 +11,7 @@ public class User {
     /**
      * 用户标识。
      */
-    private int id;
+    private String id;
     /**
      * 用户名。
      */
@@ -19,7 +19,7 @@ public class User {
     /**
      * 年龄。
      */
-    private short age;
+    private int age;
     /**
      * 出生日期。
      */
@@ -27,7 +27,7 @@ public class User {
     /**
      * 删除状态，0未删除，1已删除。
      */
-    private byte deleteStatus;
+    private int deleteStatus;
     /**
      * 创建时间。
      */
@@ -41,11 +41,11 @@ public class User {
      */
     private Date deleteTime;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -57,11 +57,11 @@ public class User {
         this.username = username;
     }
 
-    public short getAge() {
+    public int getAge() {
         return age;
     }
 
-    public void setAge(short age) {
+    public void setAge(int age) {
         this.age = age;
     }
 
@@ -73,11 +73,11 @@ public class User {
         this.birthday = birthday;
     }
 
-    public byte getDeleteStatus() {
+    public int getDeleteStatus() {
         return deleteStatus;
     }
 
-    public void setDeleteStatus(byte deleteStatus) {
+    public void setDeleteStatus(int deleteStatus) {
         this.deleteStatus = deleteStatus;
     }
 
