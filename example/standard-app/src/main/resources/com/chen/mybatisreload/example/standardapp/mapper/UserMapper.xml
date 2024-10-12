@@ -8,7 +8,7 @@
   </select>
   <select id="selectByPrimaryKey" resultType="user" parameterType="user">
     select *
-    from t_user
+    from mybatis.t_user
     where id = #{user.id}
   </select>
 </mapper>
