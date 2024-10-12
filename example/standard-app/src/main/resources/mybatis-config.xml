@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <settings>
+    <setting name="logPrefix" value="sql."/>
+    <setting name="logImpl" value="SLF4J"/>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+  </settings>
+  <typeAliases>
+    <typeAlias type="com.chen.mybatisreload.example.standardapp.entity.User" alias="user"/>
+  </typeAliases>
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="org.h2.Driver"/>
+        <property name="url" value="jdbc:h2:./.data/demo-database;AUTO_SERVER=TRUE"/>
+      </dataSource>
+    </environment>
+  </environments>
+  <mappers>
+    <package name="com.chen.mybatisreload.example.standardapp.mapper"/>
+  </mappers>
+</configuration>

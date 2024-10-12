@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chen.mybatisreload.example.standardapp.mapper.UserMapper">
+  <select id="selectBlog" resultType="com.chen.mybatisreload.example.standardapp.entity.User">
+    select * from Blog where id = #{id}
+  </select>
+  <select id="selectByPrimaryKey" resultType="user" parameterType="user">
+    select *
+    from t_user
+    where id = #{user.id}
+  </select>
+</mapper>
