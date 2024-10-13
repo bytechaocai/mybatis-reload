@@ -7,6 +7,7 @@ import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
@@ -22,6 +23,7 @@ public class MybatisConfiguration {
     @Bean
     public SqlSessionFactory getSqlSessionFactoryBean(@Autowired DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setMapperLocations(new ClassPathResource("mappers/user-mapper.xml"));
         sqlSessionFactoryBean.setDataSource(dataSource);
         return sqlSessionFactoryBean.getObject();
     }
