@@ -28,8 +28,8 @@ public class MybatisConfiguration {
 
     @Bean
     public DataSource getDataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource(
-                System.getProperty("url"));
+        // 在tomcat中启动时，.data会在tomcat的bin目录下
+        DriverManagerDataSource dataSource = new DriverManagerDataSource(System.getenv("url"));
         dataSource.setDriverClassName("org.h2.Driver");
         return dataSource;
     }
