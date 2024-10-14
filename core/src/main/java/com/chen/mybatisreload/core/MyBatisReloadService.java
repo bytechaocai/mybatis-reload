@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -37,7 +38,8 @@ public class MyBatisReloadService implements InitializingBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyBatisReloadService.class);
     @Resource
     private SqlSessionFactory sqlSessionFactory;
-
+    private Configuration configuration;
+    private Set<String> loadedResources;
     private Map<String, MappedStatement> mappedStatements;
     private Map<String, ResultMap> resultMaps;
     private Map<String, ParameterMap> parameterMaps;
@@ -58,7 +60,7 @@ public class MyBatisReloadService implements InitializingBean {
      *
      * @param reloadContext 要加载的mapper。
      *
-     * @return
+     * @return 加载结果。
      */
     public ReloadContext reloadMapper(ReloadContext reloadContext) {
         LOGGER.info("开始加载");
@@ -88,11 +90,10 @@ public class MyBatisReloadService implements InitializingBean {
         if (!cpr.exists()) {
             throw new ReloadException(String.format("文件[%s]不存在", filepath));
         }
-        Configuration configuration = sqlSessionFactory.getConfiguration();
         try (InputStream in = cpr.getInputStream()) {
-            XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(in, configuration, cpr.toString(),
+            XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(in, configuration, cpr.getPath(),
                     configuration.getSqlFragments());
-            preReloadXml(xmlMapperBuilder);
+            preReloadXml(xmlMapperBuilder, cpr.getPath());
             xmlMapperBuilder.parse();
             mapperXml.setSuccess(true);
             mapperXml.setMessage("加载成功");
@@ -105,12 +106,13 @@ public class MyBatisReloadService implements InitializingBean {
     }
 
     /**
-     * 删除当前文件已经解析的内容。
+     * 准备解析xml，主要是删除已经解析的内容。
      *
      * @param xmlMapperBuilder 映射构建器。
+     * @param resource 资源类路径。
      */
     @SuppressWarnings({"java:S3011", "DataFlowIssue", "java:S2259"})
-    private void preReloadXml(XMLMapperBuilder xmlMapperBuilder) {
+    private void preReloadXml(XMLMapperBuilder xmlMapperBuilder, String resource) {
         Field field = ReflectionUtils.findField(xmlMapperBuilder.getClass(), "parser");
         field.setAccessible(true);
         XPathParser parser;
@@ -122,6 +124,8 @@ public class MyBatisReloadService implements InitializingBean {
         XNode xNode = parser.evalNode("/mapper");
         String namespace = xNode.getStringAttribute("namespace");
         LOGGER.info("开始删除命名空间{}中已经解析的内容", namespace);
+        // org.apache.ibatis.builder.xml.XMLMapperBuilder.parse使用此字段判断是否进行解析
+        loadedResources.remove(resource);
         remove(namespace, mappedStatements);
         remove(namespace, resultMaps);
         remove(namespace, parameterMaps);
@@ -146,12 +150,13 @@ public class MyBatisReloadService implements InitializingBean {
      * 通过反射获取statement,resultMaps,parameterMaps,sqlFragments对象。
      *
      * @param fieldName 字段名。
+     * @param clazz 类型。
      */
     @SuppressWarnings({"java:S3011", "DataFlowIssue", "java:S2259"})
-    private Object getFieldValueInConfiguration(String fieldName) {
-        Field field = ReflectionUtils.findField(Configuration.class, fieldName);
+    private Object getFieldValueInConfiguration(String fieldName, Class<?> clazz) {
+        Field field = ReflectionUtils.findField(clazz, fieldName);
         field.setAccessible(true);
-        return ReflectionUtils.getField(field, this.sqlSessionFactory.getConfiguration());
+        return ReflectionUtils.getField(field, configuration);
     }
 
 
@@ -159,11 +164,14 @@ public class MyBatisReloadService implements InitializingBean {
     @SuppressWarnings("unchecked")
     public void afterPropertiesSet() throws Exception {
         LOGGER.info("mybatis已经初始化完成，开始提取xml中的statement,resultMaps,parameterMaps,sqlFragments");
-        Configuration configuration = sqlSessionFactory.getConfiguration();
-        this.mappedStatements = (Map<String, MappedStatement>) getFieldValueInConfiguration("mappedStatements");
+        configuration = sqlSessionFactory.getConfiguration();
+        this.mappedStatements = (Map<String, MappedStatement>) getFieldValueInConfiguration("mappedStatements",
+                Configuration.class);
         this.sqlFragments = configuration.getSqlFragments();
-        this.parameterMaps = (Map<String, ParameterMap>) getFieldValueInConfiguration("parameterMaps");
-        this.resultMaps = (Map<String, ResultMap>) getFieldValueInConfiguration("resultMaps");
+        this.parameterMaps = (Map<String, ParameterMap>) getFieldValueInConfiguration("parameterMaps",
+                Configuration.class);
+        this.resultMaps = (Map<String, ResultMap>) getFieldValueInConfiguration("resultMaps", Configuration.class);
+        this.loadedResources = (Set<String>) getFieldValueInConfiguration("loadedResources", Configuration.class);
         LOGGER.info("提取完成");
     }
 }
