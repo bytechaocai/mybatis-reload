@@ -20,6 +20,8 @@ plugins {
 rootProject.name = 'mybatis-reload'
 // 重载功能
 include('core')
+// springboot自动配置
+include('mybatis-reload-spring-boot-starter')
 // 演示代码，tomcat环境使用
 include('example:web')
 // springboot环境使用
