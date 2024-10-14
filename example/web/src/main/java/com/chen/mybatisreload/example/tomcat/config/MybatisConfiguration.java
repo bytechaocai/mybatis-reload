@@ -16,8 +16,8 @@ import javax.sql.DataSource;
 public class MybatisConfiguration {
 
     @Bean
-    public MyBatisReloadService mybatisReloadService() {
-        return new MyBatisReloadService();
+    public MyBatisReloadService mybatisReloadService(@Autowired SqlSessionFactory sqlSessionFactory) {
+        return new MyBatisReloadService(sqlSessionFactory);
     }
 
     @Bean

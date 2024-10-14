@@ -14,12 +14,9 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -33,10 +30,8 @@ import java.util.stream.Collectors;
  *
  * @author chen
  */
-@Component
-public class MyBatisReloadService implements InitializingBean {
+public class MyBatisReloadService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MyBatisReloadService.class);
-    @Resource
     private SqlSessionFactory sqlSessionFactory;
     private Configuration configuration;
     private Set<String> loadedResources;
@@ -45,6 +40,13 @@ public class MyBatisReloadService implements InitializingBean {
     private Map<String, ParameterMap> parameterMaps;
     private Map<String, XNode> sqlFragments;
 
+    private MyBatisReloadService() {
+    }
+
+    public MyBatisReloadService(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
+        afterSqlSessionFactorySet();
+    }
 
     /**
      * 重载所有映射接口。
@@ -85,6 +87,9 @@ public class MyBatisReloadService implements InitializingBean {
      * @param directory 目录，以斜杠结尾。
      */
     private void reloadXml(MapperXml mapperXml, String directory) {
+        if (!directory.endsWith("/")) {
+            directory += "/";
+        }
         String filepath = directory + mapperXml.getFilename();
         ClassPathResource cpr = new ClassPathResource(filepath);
         if (!cpr.exists()) {
@@ -159,10 +164,11 @@ public class MyBatisReloadService implements InitializingBean {
         return ReflectionUtils.getField(field, configuration);
     }
 
-
-    @Override
+    /**
+     * SqlSessionFactory设置后的操作。
+     */
     @SuppressWarnings("unchecked")
-    public void afterPropertiesSet() throws Exception {
+    public void afterSqlSessionFactorySet() {
         LOGGER.info("mybatis已经初始化完成，开始提取xml中的statement,resultMaps,parameterMaps,sqlFragments");
         configuration = sqlSessionFactory.getConfiguration();
         this.mappedStatements = (Map<String, MappedStatement>) getFieldValueInConfiguration("mappedStatements",
@@ -173,5 +179,9 @@ public class MyBatisReloadService implements InitializingBean {
         this.resultMaps = (Map<String, ResultMap>) getFieldValueInConfiguration("resultMaps", Configuration.class);
         this.loadedResources = (Set<String>) getFieldValueInConfiguration("loadedResources", Configuration.class);
         LOGGER.info("提取完成");
+    }
+
+    public SqlSessionFactory getSqlSessionFactory() {
+        return sqlSessionFactory;
     }
 }
