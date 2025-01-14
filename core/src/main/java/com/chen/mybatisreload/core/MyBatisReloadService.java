@@ -116,7 +116,7 @@ public class MyBatisReloadService {
      * @param xmlMapperBuilder 映射构建器。
      * @param resource 资源类路径。
      */
-    @SuppressWarnings({"java:S3011", "DataFlowIssue", "java:S2259"})
+    @SuppressWarnings({"java:S3011", "java:S2259"})
     private void preReloadXml(XMLMapperBuilder xmlMapperBuilder, String resource) {
         Field field = ReflectionUtils.findField(xmlMapperBuilder.getClass(), "parser");
         field.setAccessible(true);
@@ -145,6 +145,7 @@ public class MyBatisReloadService {
         // 假设有一个mapper接口，全类名为com.example.Mapper，其中有一个方法selectOne，那么这条映射会有两个id，
         // com.example.Mapper.selectOne和selectOne。
         // 只有xml文件没有接口的sql只有一个id
+        // 如果你使用增强工具注入了curd接口，需要在这里过滤掉，否则会找不到sql
         List<String> simpleKeyList = keyList.stream().map(p -> p.substring(namespace.length() + 1))
                 .collect(Collectors.toList());
         keyList.forEach(map::remove);
@@ -157,7 +158,7 @@ public class MyBatisReloadService {
      * @param fieldName 字段名。
      * @param clazz 类型。
      */
-    @SuppressWarnings({"java:S3011", "DataFlowIssue", "java:S2259"})
+    @SuppressWarnings({"java:S3011", "java:S2259"})
     private Object getFieldValueInConfiguration(String fieldName, Class<?> clazz) {
         Field field = ReflectionUtils.findField(clazz, fieldName);
         field.setAccessible(true);
