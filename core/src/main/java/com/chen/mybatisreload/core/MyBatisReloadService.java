@@ -39,12 +39,19 @@ public class MyBatisReloadService {
     private Map<String, ResultMap> resultMaps;
     private Map<String, ParameterMap> parameterMaps;
     private Map<String, XNode> sqlFragments;
+    /**
+     * 配置类类型。
+     *
+     * <p>mybatis-plus会使用自己定义的配置类，如果使用mybatis的配置类，会导致反射拿不到属性。</p>
+     */
+    private Class<? extends Configuration> configurationClass;
 
     private MyBatisReloadService() {
     }
 
     public MyBatisReloadService(SqlSessionFactory sqlSessionFactory) {
         this.sqlSessionFactory = sqlSessionFactory;
+        this.configurationClass = sqlSessionFactory.getConfiguration().getClass();
         afterSqlSessionFactorySet();
     }
 
@@ -156,12 +163,15 @@ public class MyBatisReloadService {
      * 通过反射获取statement,resultMaps,parameterMaps,sqlFragments对象。
      *
      * @param fieldName 字段名。
-     * @param clazz 类型。
      */
     @SuppressWarnings({"java:S3011", "java:S2259"})
-    private Object getFieldValueInConfiguration(String fieldName, Class<?> clazz) {
-        Field field = ReflectionUtils.findField(clazz, fieldName);
-        field.setAccessible(true);
+    private Object getFieldValueInConfiguration(String fieldName) {
+        Field field = ReflectionUtils.findField(configurationClass, fieldName);
+        // 这个方法只用来获取配置类中的字段，所以这里可以忽略警告。
+        // noinspection DataFlowIssue
+        if (!field.isAccessible()) {
+            field.setAccessible(true);
+        }
         return ReflectionUtils.getField(field, configuration);
     }
 
@@ -172,13 +182,11 @@ public class MyBatisReloadService {
     public void afterSqlSessionFactorySet() {
         LOGGER.info("mybatis已经初始化完成，开始提取xml中的statement,resultMaps,parameterMaps,sqlFragments");
         configuration = sqlSessionFactory.getConfiguration();
-        this.mappedStatements = (Map<String, MappedStatement>) getFieldValueInConfiguration("mappedStatements",
-                Configuration.class);
+        this.mappedStatements = (Map<String, MappedStatement>) getFieldValueInConfiguration("mappedStatements");
         this.sqlFragments = configuration.getSqlFragments();
-        this.parameterMaps = (Map<String, ParameterMap>) getFieldValueInConfiguration("parameterMaps",
-                Configuration.class);
-        this.resultMaps = (Map<String, ResultMap>) getFieldValueInConfiguration("resultMaps", Configuration.class);
-        this.loadedResources = (Set<String>) getFieldValueInConfiguration("loadedResources", Configuration.class);
+        this.parameterMaps = (Map<String, ParameterMap>) getFieldValueInConfiguration("parameterMaps");
+        this.resultMaps = (Map<String, ResultMap>) getFieldValueInConfiguration("resultMaps");
+        this.loadedResources = (Set<String>) getFieldValueInConfiguration("loadedResources");
         LOGGER.info("提取完成");
     }
 
